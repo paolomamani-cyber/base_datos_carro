@@ -1,13 +1,15 @@
 -- =============================================================================
--- SCRIPT DE POBLACIÓN Y ACTUALIZACIONES (12 TABLAS)
--- Ejecutar después de 01_tablas.sql en PostgreSQL
+-- SCRIPT DE POBLACIÓN Y ACTUALIZACIONES (12 TABLAS) - POSTGRESQL
+-- Ejecutar después de 01_tablas.sql
+-- Cada bloque usa START TRANSACTION y COMMIT para asegurar atomicidad:
+-- o se ejecutan todos los INSERT y UPDATE del módulo, o no se guarda ninguno.
 -- =============================================================================
 
 
 -- =============================================================================
 -- 1. MÓDULO SUCURSAL
--- Registro base de 5 sucursales y actualizaciones de dirección y teléfonos.
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla sucursal
 
 INSERT INTO sucursal (nombre, direccion, ciudad, telefono)
 VALUES
@@ -17,34 +19,19 @@ VALUES
 ('Sucursal Miraflores', 'Av. Pardo 810', 'Lima', '01-4451234'),
 ('Sucursal Cusco Centro', 'Av. El Sol 504', 'Cusco', '084-224466');
 
--- Actualización de datos de contacto y sedes
-UPDATE sucursal
-SET telefono = '054-251999'
-WHERE sucursal_id = 1;
+UPDATE sucursal SET telefono = '054-251999' WHERE sucursal_id = 1;
+UPDATE sucursal SET direccion = 'Av. Aviación km 5.5, Terminal Aéreo' WHERE sucursal_id = 2;
+UPDATE sucursal SET nombre = 'Sucursal Yanahuara Plaza' WHERE sucursal_id = 3;
+UPDATE sucursal SET telefono = '01-4459876' WHERE sucursal_id = 4;
+UPDATE sucursal SET direccion = 'Av. El Sol 510, Int. 2' WHERE sucursal_id = 5;
 
-UPDATE sucursal
-SET direccion = 'Av. Aviación km 5.5, Terminal Aéreo'
-WHERE sucursal_id = 2;
-
-UPDATE sucursal
-SET nombre = 'Sucursal Yanahuara Plaza'
-WHERE sucursal_id = 3;
-
-UPDATE sucursal
-SET telefono = '01-4459876'
-WHERE sucursal_id = 4;
-
-UPDATE sucursal
-SET direccion = 'Av. El Sol 510, Int. 2'
-WHERE sucursal_id = 5;
-
-COMMIT; -- Confirmación atómica: registro y actualización de sucursales
+COMMIT; -- Guarda definitivamente en la BD las 5 sucursales creadas y sus actualizaciones de teléfono, nombre y dirección.
 
 
 -- =============================================================================
 -- 2. MÓDULO CATEGORIA
--- Registro de 5 categorías de vehículos y ajustes de tarifas diarias.
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla categoria
 
 INSERT INTO categoria (nombre, descripcion, tarifa_diaria)
 VALUES
@@ -54,34 +41,19 @@ VALUES
 ('Pickup', 'Camioneta 4x4 para carga y terrenos difíciles', 260.00),
 ('Minivan', 'Vehículo amplio para grupos de hasta 7 pasajeros', 230.00);
 
--- Actualización de tarifas y descripciones
-UPDATE categoria
-SET tarifa_diaria = 125.00
-WHERE categoria_id = 1;
+UPDATE categoria SET tarifa_diaria = 125.00 WHERE categoria_id = 1;
+UPDATE categoria SET tarifa_diaria = 99.00 WHERE categoria_id = 2;
+UPDATE categoria SET descripcion = 'SUV moderna equipada para familia y viajes largos' WHERE categoria_id = 3;
+UPDATE categoria SET tarifa_diaria = 275.00 WHERE categoria_id = 4;
+UPDATE categoria SET descripcion = 'Vehículo familiar de gran capacidad con maletera amplia' WHERE categoria_id = 5;
 
-UPDATE categoria
-SET tarifa_diaria = 99.00
-WHERE categoria_id = 2;
-
-UPDATE categoria
-SET descripcion = 'SUV moderna equipada para familia y viajes largos'
-WHERE categoria_id = 3;
-
-UPDATE categoria
-SET tarifa_diaria = 275.00
-WHERE categoria_id = 4;
-
-UPDATE categoria
-SET descripcion = 'Vehículo familiar de gran capacidad con maletera amplia'
-WHERE categoria_id = 5;
-
-COMMIT; -- Confirmación atómica: catálogo y tarifas de categorías
+COMMIT; -- Guarda definitivamente las 5 categorías de vehículos y los reajustes realizados a sus tarifas diarias y descripciones.
 
 
 -- =============================================================================
 -- 3. MÓDULO CLIENTE
--- Registro base de 5 clientes y actualizaciones de datos de contacto y dirección.
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla cliente
 
 INSERT INTO cliente
 (dni, nombre, apellido, telefono, correo, licencia, direccion, fecha_registro)
@@ -92,34 +64,19 @@ VALUES
 ('74145223', 'Pablo', 'Torres', '965432109', 'pablo.torres@gmail.com', 'LIC007', 'Hunter', '2025-02-10'),
 ('90441524', 'Juan', 'Flores', '954321098', 'juan.flores@gmail.com', 'LIC020', 'Arequipa', '2025-02-18');
 
--- Actualización de dirección, teléfono, apellido y licencia de clientes
-UPDATE cliente
-SET direccion = 'Miraflores'
-WHERE dni = '49975626';
+UPDATE cliente SET direccion = 'Miraflores' WHERE dni = '49975626';
+UPDATE cliente SET telefono = '938294067' WHERE dni = '59945620';
+UPDATE cliente SET apellido = 'Quispe Mamani' WHERE licencia = 'LIC010';
+UPDATE cliente SET direccion = 'Sachaca' WHERE direccion = 'Hunter';
+UPDATE cliente SET licencia = 'LIC015' WHERE dni = '90441524';
 
-UPDATE cliente
-SET telefono = '938294067'
-WHERE dni = '59945620';
-
-UPDATE cliente
-SET apellido = 'Quispe Mamani'
-WHERE licencia = 'LIC010';
-
-UPDATE cliente
-SET direccion = 'Sachaca'
-WHERE direccion = 'Hunter';
-
-UPDATE cliente
-SET licencia = 'LIC015'
-WHERE dni = '90441524';
-
-COMMIT; -- Confirmación atómica: inserción y updates de la tabla cliente
+COMMIT; -- Confirma y guarda los 5 clientes registrados junto con las correcciones de dirección, teléfono, apellido y número de licencia.
 
 
 -- =============================================================================
 -- 4. MÓDULO SEGURO
--- Registro de 5 planes de seguro y ajustes de cobertura y costo diario.
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla seguro
 
 INSERT INTO seguro (nombre, cobertura, costo_diario)
 VALUES
@@ -129,34 +86,19 @@ VALUES
 ('Seguro de Lunas y Llantas', 'Reposición de parabrisas, lunas y neumáticos', 20.00),
 ('Seguro Premium Plus', 'Cobertura total sin franquicia y auto de reemplazo', 65.00);
 
--- Actualización de costos diarios y coberturas
-UPDATE seguro
-SET costo_diario = 18.00
-WHERE seguro_id = 1;
+UPDATE seguro SET costo_diario = 18.00 WHERE seguro_id = 1;
+UPDATE seguro SET costo_diario = 48.00 WHERE seguro_id = 2;
+UPDATE seguro SET cobertura = 'Robo parcial, robo total y cobertura por vandalismo' WHERE seguro_id = 3;
+UPDATE seguro SET costo_diario = 22.50 WHERE seguro_id = 4;
+UPDATE seguro SET costo_diario = 70.00 WHERE seguro_id = 5;
 
-UPDATE seguro
-SET costo_diario = 48.00
-WHERE seguro_id = 2;
-
-UPDATE seguro
-SET cobertura = 'Robo parcial, robo total y cobertura por vandalismo'
-WHERE seguro_id = 3;
-
-UPDATE seguro
-SET costo_diario = 22.50
-WHERE seguro_id = 4;
-
-UPDATE seguro
-SET costo_diario = 70.00
-WHERE seguro_id = 5;
-
-COMMIT; -- Confirmación atómica: catálogo de seguros vehiculares
+COMMIT; -- Guarda de forma permanente los 5 planes de seguro y las actualizaciones de sus costos diarios y coberturas.
 
 
 -- =============================================================================
 -- 5. MÓDULO VENDEDOR
--- Registro de 5 vendedores (primero supervisores) y actualizaciones laborales.
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla vendedor
 
 INSERT INTO vendedor
 (dni, nombre, apellido, salario, bono, fecha_registro, correo, supervisor_dni, sucursal_id)
@@ -167,34 +109,19 @@ VALUES
 ('54321876', 'Elena', 'Vargas', 2100.00, 300.20, '2025-04-05', 'elena4@gmail.com', NULL, 3),
 ('43218765', 'Jorge', 'Castro', 1850.50, 180.20, '2025-05-12', 'jorge5@gmail.com', NULL, 4);
 
--- Actualización de datos laborales y jerarquía
-UPDATE vendedor
-SET apellido = 'Rodriguez'
-WHERE dni = '87654321';
+UPDATE vendedor SET apellido = 'Rodriguez' WHERE dni = '87654321';
+UPDATE vendedor SET salario = 1800.00 WHERE dni = '76543218';
+UPDATE vendedor SET correo = 'miguel@gmail.com' WHERE dni = '65432187';
+UPDATE vendedor SET supervisor_dni = '87654321' WHERE dni = '54321876';
+UPDATE vendedor SET fecha_registro = '2025-05-21' WHERE dni = '43218765';
 
-UPDATE vendedor
-SET salario = 1800.00
-WHERE dni = '76543218';
-
-UPDATE vendedor
-SET correo = 'miguel@gmail.com'
-WHERE dni = '65432187';
-
-UPDATE vendedor
-SET supervisor_dni = '87654321'
-WHERE dni = '54321876';
-
-UPDATE vendedor
-SET fecha_registro = '2025-05-21'
-WHERE dni = '43218765';
-
-COMMIT; -- Confirmación atómica: gestión de datos del módulo vendedor
+COMMIT; -- Confirma y guarda los 5 vendedores, su asignación a sucursales, su jerarquía de supervisores y ajustes salariales.
 
 
 -- =============================================================================
 -- 6. MÓDULO CARRO
--- Alta de 5 vehículos y actualizaciones de estado, color y capacidad.
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla carro
 
 INSERT INTO carro
 (placa, marca, modelo, estado, color, anio, capacidad, kilometraje, categoria_id, sucursal_id)
@@ -205,34 +132,19 @@ VALUES
 ('JKL321', 'Nissan', 'Versa', 'disponible', 'Gris', 2022, 5, 18500, 1, 3),
 ('MNO654', 'Chevrolet', 'Tracker', 'disponible', 'Azul', 2024, 5, 5400, 3, 4);
 
--- Actualizaciones en la información del vehículo
-UPDATE carro
-SET color = 'Plata'
-WHERE placa = 'ABC123';
+UPDATE carro SET color = 'Plata' WHERE placa = 'ABC123';
+UPDATE carro SET estado = 'mantenimiento' WHERE placa = 'DEF456';
+UPDATE carro SET color = 'Negro Metalizado' WHERE placa = 'JKL321';
+UPDATE carro SET estado = 'alquilado' WHERE placa = 'JKL321';
+UPDATE carro SET capacidad = 7 WHERE placa = 'MNO654';
 
-UPDATE carro
-SET estado = 'mantenimiento'
-WHERE placa = 'DEF456';
-
-UPDATE carro
-SET color = 'Negro Metalizado'
-WHERE placa = 'JKL321';
-
-UPDATE carro
-SET estado = 'alquilado'
-WHERE placa = 'JKL321';
-
-UPDATE carro
-SET capacidad = 7
-WHERE placa = 'MNO654';
-
-COMMIT; -- Confirmación atómica: mantenimiento del inventario vehicular
+COMMIT; -- Guarda definitivamente los 5 vehículos de la flota y los cambios en su estado operativo, color y capacidad.
 
 
 -- =============================================================================
 -- 7. MÓDULO SOLICITUD
--- Registro de 5 solicitudes (conectadas con clientes, vendedores y autos válidos).
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla solicitud
 
 INSERT INTO solicitud
 (tiempo_alquiler, precio_total, estado, fecha_solicitud, fecha_inicio, fecha_fin, cliente_dni, placa, vendedor_dni)
@@ -243,34 +155,19 @@ VALUES
 (2, 180.00, 'en_curso',   '2025-06-06', '2025-06-08', '2025-06-10', '74145223', 'JKL321', '54321876'),
 (2, 700.00, 'finalizada', '2025-07-07', '2025-07-09', '2025-07-11', '90441524', 'MNO654', '43218765');
 
--- Actualización de estados, precios, fechas y vendedor asignado
-UPDATE solicitud
-SET estado = 'confirmada'
-WHERE solicitud_id = 1;
+UPDATE solicitud SET estado = 'confirmada' WHERE solicitud_id = 1;
+UPDATE solicitud SET precio_total = 300.00 WHERE solicitud_id = 2;
+UPDATE solicitud SET fecha_fin = '2025-05-10', tiempo_alquiler = 3 WHERE solicitud_id = 3;
+UPDATE solicitud SET vendedor_dni = '43218765' WHERE solicitud_id = 4;
+UPDATE solicitud SET precio_total = 740.00 WHERE solicitud_id = 5;
 
-UPDATE solicitud
-SET precio_total = 300.00
-WHERE solicitud_id = 2;
-
-UPDATE solicitud
-SET fecha_fin = '2025-05-10', tiempo_alquiler = 3
-WHERE solicitud_id = 3;
-
-UPDATE solicitud
-SET vendedor_dni = '43218765'
-WHERE solicitud_id = 4;
-
-UPDATE solicitud
-SET precio_total = 740.00
-WHERE solicitud_id = 5;
-
-COMMIT; -- Confirmación atómica: procesamiento de solicitudes de alquiler
+COMMIT; -- Confirma y guarda las 5 solicitudes de alquiler junto con las actualizaciones de estado, fechas, precios y vendedor asignado.
 
 
 -- =============================================================================
 -- 8. MÓDULO SOLICITUD_SEGURO
--- Asociación de seguros contratados por solicitud y ajustes de subtotal.
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla intermedia solicitud_seguro
 
 INSERT INTO solicitud_seguro (solicitud_id, seguro_id, subtotal)
 VALUES
@@ -280,34 +177,19 @@ VALUES
 (4, 4, 45.00),
 (5, 5, 140.00);
 
--- Actualización de subtotales tras descuentos o recalculos
-UPDATE solicitud_seguro
-SET subtotal = 50.00
-WHERE solicitud_id = 1 AND seguro_id = 1;
+UPDATE solicitud_seguro SET subtotal = 50.00 WHERE solicitud_id = 1 AND seguro_id = 1;
+UPDATE solicitud_seguro SET subtotal = 180.00 WHERE solicitud_id = 2 AND seguro_id = 2;
+UPDATE solicitud_seguro SET subtotal = 95.00 WHERE solicitud_id = 3 AND seguro_id = 3;
+UPDATE solicitud_seguro SET subtotal = 40.00 WHERE solicitud_id = 4 AND seguro_id = 4;
+UPDATE solicitud_seguro SET subtotal = 130.00 WHERE solicitud_id = 5 AND seguro_id = 5;
 
-UPDATE solicitud_seguro
-SET subtotal = 180.00
-WHERE solicitud_id = 2 AND seguro_id = 2;
-
-UPDATE solicitud_seguro
-SET subtotal = 95.00
-WHERE solicitud_id = 3 AND seguro_id = 3;
-
-UPDATE solicitud_seguro
-SET subtotal = 40.00
-WHERE solicitud_id = 4 AND seguro_id = 4;
-
-UPDATE solicitud_seguro
-SET subtotal = 130.00
-WHERE solicitud_id = 5 AND seguro_id = 5;
-
-COMMIT; -- Confirmación atómica: seguros contratados por solicitud
+COMMIT; -- Guarda definitivamente la relación de seguros contratados por cada solicitud y los recalculos de sus subtotales.
 
 
 -- =============================================================================
 -- 9. MÓDULO REGISTRO
--- Registro de 5 actas de entrega/devolución vinculadas a las solicitudes 1 a 5.
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla registro
 
 INSERT INTO registro
 (solicitud_id, vendedor_dni, fecha_entrega, fecha_devolucion, kilometraje_inicial, kilometraje_final, combustible_entrega, observaciones)
@@ -318,36 +200,19 @@ VALUES
 (4, '54321876', '2025-06-08 11:00:00', NULL,                  18500, NULL,  'medio', 'Vehículo actualmente en circulación.'),
 (5, '43218765', '2025-07-09 09:15:00', '2025-07-11 18:00:00',  5400,  5950, 'lleno', 'Devuelto en excelentes condiciones.');
 
--- Actualizaciones de actas, kilometrajes y cierre de devolución
-UPDATE registro
-SET observaciones = 'Entregado limpio, devuelto con rayón leve en puerta trasera.'
-WHERE solicitud_id = 1;
+UPDATE registro SET observaciones = 'Entregado limpio, devuelto con rayón leve en puerta trasera.' WHERE solicitud_id = 1;
+UPDATE registro SET kilometraje_final = 22480 WHERE solicitud_id = 2;
+UPDATE registro SET combustible_entrega = 'tres_cuartos' WHERE solicitud_id = 3;
+UPDATE registro SET fecha_devolucion = '2025-06-10 15:00:00', kilometraje_final = 18820, observaciones = 'Vehículo devuelto conforme.' WHERE solicitud_id = 4;
+UPDATE registro SET vendedor_dni = '87654321' WHERE solicitud_id = 5;
 
-UPDATE registro
-SET kilometraje_final = 22480
-WHERE solicitud_id = 2;
-
-UPDATE registro
-SET combustible_entrega = 'tres_cuartos'
-WHERE solicitud_id = 3;
-
-UPDATE registro
-SET fecha_devolucion = '2025-06-10 15:00:00',
-    kilometraje_final = 18820,
-    observaciones = 'Vehículo devuelto conforme.'
-WHERE solicitud_id = 4;
-
-UPDATE registro
-SET vendedor_dni = '87654321'
-WHERE solicitud_id = 5;
-
-COMMIT; -- Confirmación atómica: formalización de actas de entrega y devolución
+COMMIT; -- Confirma y guarda las 5 actas de entrega/devolución, cerrando el alquiler 4 y actualizando kilometrajes y observaciones.
 
 
 -- =============================================================================
 -- 10. MÓDULO PAGO
--- Registro de 5 pagos vinculados a las solicitudes y actualizaciones de estado.
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla pago
 
 INSERT INTO pago
 (solicitud_id, monto, metodo_pago, estado, fecha_pago, codigo_operacion)
@@ -358,34 +223,19 @@ VALUES
 (4, 180.00, 'efectivo',      'pendiente',  '2025-06-08 10:50:00', 'OP-20250608-004'),
 (5, 740.00, 'tarjeta',       'completado', '2025-07-09 09:00:00', 'OP-20250709-005');
 
--- Actualización de confirmaciones, montos y métodos de pago
-UPDATE pago
-SET monto = 400.00
-WHERE pago_id = 1;
+UPDATE pago SET monto = 400.00 WHERE pago_id = 1;
+UPDATE pago SET estado = 'completado' WHERE pago_id = 2;
+UPDATE pago SET metodo_pago = 'transferencia' WHERE pago_id = 3;
+UPDATE pago SET estado = 'completado', codigo_operacion = 'OP-20250608-004-OK' WHERE pago_id = 4;
+UPDATE pago SET monto = 750.00 WHERE pago_id = 5;
 
-UPDATE pago
-SET estado = 'completado'
-WHERE pago_id = 2;
-
-UPDATE pago
-SET metodo_pago = 'transferencia'
-WHERE pago_id = 3;
-
-UPDATE pago
-SET estado = 'completado', codigo_operacion = 'OP-20250608-004-OK'
-WHERE pago_id = 4;
-
-UPDATE pago
-SET monto = 750.00
-WHERE pago_id = 5;
-
-COMMIT; -- Confirmación atómica: control de pagos y conciliación
+COMMIT; -- Guarda definitivamente los 5 pagos vinculados a las solicitudes y la confirmación de los pagos pendientes.
 
 
 -- =============================================================================
 -- 11. MÓDULO MANTENIMIENTO
--- Registro de 5 servicios de mantenimiento a la flota y actualizaciones de cierre.
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla mantenimiento
 
 INSERT INTO mantenimiento
 (placa, tipo, descripcion, costo, fecha_inicio, fecha_fin)
@@ -396,34 +246,19 @@ VALUES
 ('JKL321', 'inspeccion', 'Revisión técnica general y alineamiento', 190.00, '2025-06-12', '2025-06-12'),
 ('MNO654', 'preventivo', 'Mantenimiento programado de 5,000 km', 350.00, '2025-07-15', NULL);
 
--- Actualización de costos, fechas de finalización y detalles
-UPDATE mantenimiento
-SET costo = 300.00
-WHERE mantenimiento_id = 1;
+UPDATE mantenimiento SET costo = 300.00 WHERE mantenimiento_id = 1;
+UPDATE mantenimiento SET fecha_fin = '2025-04-15' WHERE mantenimiento_id = 2;
+UPDATE mantenimiento SET descripcion = 'Lavado profundo de tapicería, encerado y ozono' WHERE mantenimiento_id = 3;
+UPDATE mantenimiento SET costo = 210.00 WHERE mantenimiento_id = 4;
+UPDATE mantenimiento SET fecha_fin = '2025-07-16', costo = 370.00 WHERE mantenimiento_id = 5;
 
-UPDATE mantenimiento
-SET fecha_fin = '2025-04-15'
-WHERE mantenimiento_id = 2;
-
-UPDATE mantenimiento
-SET descripcion = 'Lavado profundo de tapicería, encerado y ozono'
-WHERE mantenimiento_id = 3;
-
-UPDATE mantenimiento
-SET costo = 210.00
-WHERE mantenimiento_id = 4;
-
-UPDATE mantenimiento
-SET fecha_fin = '2025-07-16', costo = 370.00
-WHERE mantenimiento_id = 5;
-
-COMMIT; -- Confirmación atómica: historial de mantenimientos vehiculares
+COMMIT; -- Confirma y guarda los 5 registros de mantenimiento vehicular, incluyendo el cierre de fechas y ajuste de costos.
 
 
 -- =============================================================================
 -- 12. MÓDULO INCIDENTE
--- Registro de 5 incidentes asociados a actas de registro y actualizaciones de pago.
-START TRANSACTION;
+-- =============================================================================
+START TRANSACTION; -- Inicia el paquete temporal de cambios para la tabla incidente
 
 INSERT INTO incidente
 (registro_id, tipo, descripcion, monto_penalidad, fecha_incidente, pagado)
@@ -434,25 +269,10 @@ VALUES
 (4, 'otro',    'Pérdida de llave de repuesto del vehículo', 120.00, '2025-06-10', FALSE),
 (5, 'danio',   'Abolladura menor en parachoques delantero', 310.00, '2025-07-11', FALSE);
 
--- Actualización de penalidades, descripciones y estado de pago
-UPDATE incidente
-SET pagado = TRUE
-WHERE incidente_id = 1;
+UPDATE incidente SET pagado = TRUE WHERE incidente_id = 1;
+UPDATE incidente SET monto_penalidad = 220.00, pagado = TRUE WHERE incidente_id = 2;
+UPDATE incidente SET descripcion = 'Devolución fuera del horario acordado (2.5 horas)' WHERE incidente_id = 3;
+UPDATE incidente SET monto_penalidad = 150.00 WHERE incidente_id = 4;
+UPDATE incidente SET pagado = TRUE WHERE incidente_id = 5;
 
-UPDATE incidente
-SET monto_penalidad = 220.00, pagado = TRUE
-WHERE incidente_id = 2;
-
-UPDATE incidente
-SET descripcion = 'Devolución fuera del horario acordado (2.5 horas)'
-WHERE incidente_id = 3;
-
-UPDATE incidente
-SET monto_penalidad = 150.00
-WHERE incidente_id = 4;
-
-UPDATE incidente
-SET pagado = TRUE
-WHERE incidente_id = 5;
-
-COMMIT; -- Confirmación atómica: gestión de incidentes y penalidades
+COMMIT; -- Guarda definitivamente los 5 incidentes reportados en los alquileres y actualiza sus montos y estados de cancelación.
